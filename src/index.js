@@ -12,8 +12,6 @@ const  request = requestFactory({
   jar: true
 })
 
-require('request-debug')(request);
-
 const baseUrl = 'https://secure.fr.vente-privee.com'
 
 module.exports = new BaseKonnector(start)
