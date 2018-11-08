@@ -4,7 +4,7 @@
   "type": "konnector",
   "language": "node",
   "icon": "logo_vp.svg",
-  "slug": "template",
+  "slug": "venteprivee",
   "source": "git://github.com/konnectors/cozy-konnector-template.git",
   "editor": "Gaël Le Lostec",
   "vendor_link": "Link to the target website",
