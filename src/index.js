@@ -38,10 +38,7 @@ function authenticate(username, password) {
     url: `https://secure.fr.vente-privee.com/authentication/login/FR?ReturnUrl=https%3a%2f%2fsecure.fr.vente-privee.com%2fns%2ffr-fr%2fhome%2fdefault%2fclassic`,
     formSelector: 'form#authenticationForm',
     formData: { Mail: username, Password: password },
-    validate: statusCode => {
-      log('info', statusCode)
-      return statusCode === 200 || log('error', 'Invalid credentials')
-    }
+    validate: (statusCode, $) => !$('#mdp').length
   })
 }
 
