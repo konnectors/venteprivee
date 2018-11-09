@@ -74,7 +74,7 @@ function parseDocuments($) {
   return docs.map(doc => ({
     ...doc,
     currency: '€',
-    vendor: 'template',
+    vendor: 'Vente Privée',
     metadata: {
       importDate: new Date(),
       version: 1
