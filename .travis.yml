@@ -5,9 +5,8 @@ env:
   global:
   - GH_USER_EMAIL="travis@example.org"
   - GH_USER_NAME="cozy-bot"
-  - DEPLOY_REPOSITORY="git@github.com:konnectors/cozy-konnector-template.git"
-  # Token to access Cozy Registry, you should replace it with a token specific to this konnector
-  - secure: CQ44ZVjPAIVRvGgMcduSAX4VmaOrzF3nrJXPFUsNQ2tMVVdaAlI1zTNkdfntqigZgz6Mpk9x+2FcA8qrkNzQ4cW0lPP9f5dBtSH1xetfpXDFKprW4bqzmhgXSXJFTOYxkChOBPmCYJr+Vv4XqDkv/dBEPdfRSgvVyd5YxHSd5HBU91rKyR+Hox7LTnhmlXleLIs11EQgp7RK+L28MBCtCqAa2niFlKKRlqupm2FSpZzxCh9qeY0wKCQzPE+QZUm4waJ1SUGKQwbzAfyOxu2O6rwzaTSknfdJoSX6AMxjRTWBC9c3VfUGM3wjVJIqMhiUj2FQhVIjiDyX/W60/q3UMC5WYzSvEDDfhnKCPwiUKSU7HvSxx9q2YP34evxKo7KPahz9zLlQZvW+GBMyI9hbMDBTALuQVVzhftsvqfrogyYhkEPviiYiVADWNxhacsbUjRA5svXnZvtmCPo7fLFwel/krgC5Z8AwAY0YxWjSHNVScUkieSDCrlxrC09vTtG60unt9gtXbD5ruUkDLWSUwHBv2p0WY1TdP+2Vlf3yYfBvEVbqi59AxG+T17bq7Xv3QZnkrwC+UOCNCeg+gHPv+fRpUaYWzCO4uaoY/nlJa7RulQFhGca3A//6xRo/KgWw9JJnOXJelNjE9oHCUu9xShotUZKOF+O93V/BRqs9ITo=
+  - DEPLOY_REPOSITORY="git@github.com:konnectors/venteprivee.git"
+  - secure: EIsKzwupc73Kh61idKNSlfLvvw5Y2VNC7IvcXUfXsQRMihtqpc6kP6WuN6EgPRXY6N2txfXeJ1yiWpEBDa96uwx7QR0Nl/6N4hYm+hhQwA4Nn4BHyr1di/UIoIAQd9XKf6L+iK4/CUyGDkg57UZvzIi04NDO0Lievw3kBJvAaUsm+DPyOHT5moxAvM2C1JsHG61JdczlinT9kgjuyRMvqybK7HAxpZJQkqERd7YaNwlMv5ZtaSFje9+i/srhMD9mzBagcB69EBc6vrafX28k6kwBF4AQvnGNYXKiOnkcVfbhyrRUt6LZenFunwjtADhwf90LenahNfuTE/TFJhG/uk6Wn0D+prDuAYu1Co5IUqsLAqRpeprNItmWThfn7e4O89MxKjpqKfcQJfhpPVP8T6WLYp4IVfy9Kf1c+gz0isVmc93WogGeMcCNBL4GUFt10QDz58Xh4+WN5eGXXPYMD76VosWyZEYMt/lFICjP8jIyMLaOK0ENhXF7W6p/bBvJg57Gj8HaXhFvxYJwITF5nU/sbKxBIdxlrG5CndSqyiGpXsXz3Ddh+PiWpuHdSePO78b33E56KvtS4S2jZugGM3jVve9Efs5/ZUmwig/l2PesioT8+7UWWHIu/1O2lIPdxzCwE2VoFfcqmyl8l1KLLdHKUdCfI7bY/gXhNj0lWh0=
 cache:
   yarn: true
   directories:
@@ -32,9 +31,8 @@ deploy:
   on:
     tags: true
 before_install:
-# run the yarn travisDeployKey command to genrate this
-# - openssl aes-256-cbc -K $encrypted_0b21ecdcf920_key -iv $encrypted_0b21ecdcf920_iv
-#   -in github_deploy_key.enc -out /tmp/github_deploy_key -d
+- openssl aes-256-cbc -K $encrypted_fe718672c584_key -iv $encrypted_fe718672c584_iv
+  -in github_deploy_key.enc -out /tmp/github_deploy_key -d
 - eval "$(ssh-agent -s)"
 - chmod 600 /tmp/github_deploy_key
 - ssh-add /tmp/github_deploy_key

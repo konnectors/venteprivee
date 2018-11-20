@@ -5,9 +5,9 @@
   "language": "node",
   "icon": "logo_vp.svg",
   "slug": "venteprivee",
-  "source": "git://github.com/konnectors/cozy-konnector-template.git",
+  "source": "git://github.com/konnectors/venteprivee.git",
   "editor": "GaelLeLostec",
-  "vendor_link": "Link to the target website",
+  "vendor_link": "https://secure.fr.vente-privee.com/authentication/portal/FR",
   "categories": ["shopping"],
   "fields": {
     "login": {
