@@ -6,7 +6,7 @@
   "icon": "logo_vp.svg",
   "slug": "venteprivee",
   "source": "git://github.com/konnectors/cozy-konnector-template.git",
-  "editor": "Gaël Le Lostec",
+  "editor": "GaelLeLostec",
   "vendor_link": "Link to the target website",
   "categories": ["shopping"],
   "fields": {
