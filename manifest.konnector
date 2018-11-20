@@ -49,7 +49,7 @@
   "langs": ["fr", "en"],
   "locales": {
     "fr": {
-      "short_description": "Récupération des factures vente privées,
+      "short_description": "Récupération des factures vente privées",
       "long_description": "Ce template récupère une les 15 dernières factures sur votre espace vente privée",
       "permissions": {
         "bank operations": {
