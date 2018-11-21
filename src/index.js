@@ -1,3 +1,7 @@
+process.env.SENTRY_DSN =
+  process.env.SENTRY_DSN ||
+  'https://8939dc7be44d4e34928a23bf709f0251@sentry.cozycloud.cc/98'
+
 const {
   BaseKonnector,
   requestFactory,
@@ -68,7 +72,12 @@ function parseDocuments($) {
   )
 
   for (let doc of docs) {
-    doc.filename = doc.filename + '_' + doc.amount + '.pdf'
+    doc.filename =
+      'VentePrivee_' +
+      doc.filename +
+      '_' +
+      String(doc.amount).replace('.', ',') +
+      '.pdf'
   }
 
   return docs.map(doc => ({
