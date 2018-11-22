@@ -3,7 +3,7 @@
   "name": "Vente Privée",
   "type": "konnector",
   "language": "node",
-  "icon": "logo_vp.svg",
+  "icon": "icon.png",
   "slug": "venteprivee",
   "source": "git://github.com/konnectors/venteprivee.git",
   "editor": "GaelLeLostec",
@@ -56,8 +56,8 @@
   ],
   "locales": {
     "fr": {
-      "short_description": "Récupération des factures vente privées",
-      "long_description": "Ce template récupère une les 15 dernières factures sur votre espace vente privée",
+      "short_description": "Récupère vos factures",
+      "long_description": "Récupère les 15 dernières factures",
       "permissions": {
         "bank operations": {
           "description": "Utilisé pour relier les factures à des operations bancaires"
@@ -74,8 +74,8 @@
       }
     },
     "en": {
-      "short_description": "Fetch your Vente Privée bills",
-      "long_description": "This template fetches the last 15 bills in your Vente Privée account",
+      "short_description": "Fetch your bills",
+      "long_description": "Fetch the last 15 bills",
       "permissions": {
         "bank operations": {
           "description": "Required to link bank operations to bills"
