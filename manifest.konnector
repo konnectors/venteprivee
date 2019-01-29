@@ -92,5 +92,6 @@
       }
     }
   },
+  "banksTransactionRegExp": "\\bVente\\-privee\\.com\\b",
   "manifest_version": "2"
 }
