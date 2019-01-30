@@ -106,7 +106,9 @@ function normalizePrice(price) {
  */
 function normalizeDate(date) {
   date = date.split('/')
-  date = new Date(Number.parseInt(date[2]) + 2000, date[1], date[0])
+  date = new Date(
+    Number.parseInt(date[2]) + 2000 + '-' + date[1] + '-' + date[0]
+  )
   return date
 }
 
@@ -114,8 +116,7 @@ function normalizeDate(date) {
  * convert date to string for filename
  */
 function normalizeFileName(date) {
-  date = date.split('/')
-  date = Number.parseInt(date[2]) + 2000 + '-' + date[1] + '-' + date[0]
-  const filename = new Date(date).toISOString().slice(0, 10)
+  date = normalizeDate(date)
+  const filename = date.toISOString().slice(0, 10)
   return filename
 }
