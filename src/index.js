@@ -65,11 +65,11 @@ function parseDocuments($) {
       fileurl: {
         sel: 'td.td6 a.billOrder',
         attr: 'href',
-        parse: src => `${baseUrl}/${src}`
+        parse: src => (src ? `${baseUrl}/${src}` : null)
       }
     },
     'tbody .tableLine1'
-  )
+  ).filter(doc => doc.fileurl)
 
   for (let doc of docs) {
     doc.filename =
