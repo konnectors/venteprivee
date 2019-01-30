@@ -8,13 +8,21 @@ const {
   signin,
   scrape,
   saveBills,
-  log
+  log,
+  cozyClient,
+  utils
 } = require('cozy-konnector-libs')
+const groupBy = require('lodash/groupBy')
+const sortBy = require('lodash/sortBy')
+const flatMap = require('lodash/flatMap')
+
 const request = requestFactory({
   cheerio: true,
   json: false,
   jar: true
 })
+
+const VENDOR = 'Vente Privée'
 
 const baseUrl = 'https://secure.fr.vente-privee.com'
 
@@ -32,9 +40,18 @@ async function start(fields) {
   const documents = await parseDocuments($)
 
   log('info', 'Saving data to Cozy')
-  await saveBills(documents, fields, {
+  const result = await saveBills(documents, fields, {
     identifiers: ['Vente-privee.com']
   })
+
+  log('info', 'Clean old bills with wrong date...')
+  try {
+    await removeDuplicatedBills()
+  } catch (err) {
+    log('warn', `There was some error while try to remove duplicated bills`)
+    log('warn', err.message)
+  }
+  return result
 }
 
 function authenticate(username, password) {
@@ -83,7 +100,7 @@ function parseDocuments($) {
   return docs.map(doc => ({
     ...doc,
     currency: '€',
-    vendor: 'Vente Privée',
+    vendor: VENDOR,
     metadata: {
       importDate: new Date(),
       version: 1
@@ -119,4 +136,29 @@ function normalizeFileName(date) {
   date = normalizeDate(date)
   const filename = date.toISOString().slice(0, 10)
   return filename
+}
+
+async function removeDuplicatedBills() {
+  const billsByFileUrl = groupBy(
+    (await cozyClient.data.findAll('io.cozy.bills')).filter(
+      bill => bill.vendor === VENDOR
+    ),
+    'fileurl'
+  )
+
+  const billsToRemove = flatMap(Object.values(billsByFileUrl), bills =>
+    sortBy(bills, 'metadata.importDate')
+      .reverse()
+      .slice(1)
+  )
+
+  const undefinedBills =
+    billsByFileUrl['https://secure.fr.vente-privee.com/undefined']
+  if (undefinedBills) billsToRemove.push(undefinedBills[0])
+
+  if (billsToRemove.length) {
+    log('info', `${billsToRemove.length} bills to remove...`)
+    await utils.batchDelete('io.cozy.bills', billsToRemove)
+    log('info', 'done')
+  }
 }
