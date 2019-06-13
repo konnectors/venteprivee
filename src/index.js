@@ -17,6 +17,7 @@ const sortBy = require('lodash/sortBy')
 const flatMap = require('lodash/flatMap')
 
 const request = requestFactory({
+  // debug: true,
   cheerio: true,
   json: false,
   jar: true
@@ -24,7 +25,7 @@ const request = requestFactory({
 
 const VENDOR = 'Vente Privée'
 
-const baseUrl = 'https://secure.fr.vente-privee.com'
+const baseUrl = 'https://www.veepee.fr'
 
 module.exports = new BaseKonnector(start)
 
@@ -41,7 +42,9 @@ async function start(fields) {
 
   log('info', 'Saving data to Cozy')
   const result = await saveBills(documents, fields, {
-    identifiers: ['Vente-privee.com']
+    identifiers: ['Vente-privee.com'],
+    sourceAccount: this.accountId,
+    sourceAccountIdentifier: fields.login
   })
 
   log('info', 'Clean old bills with wrong date...')
@@ -56,9 +59,9 @@ async function start(fields) {
 
 function authenticate(username, password) {
   return signin({
-    url: `https://secure.fr.vente-privee.com/authentication/login/FR?ReturnUrl=https%3a%2f%2fsecure.fr.vente-privee.com%2fns%2ffr-fr%2fhome%2fdefault%2fclassic`,
+    url: baseUrl + '/authentication/Portal/FR',
     formSelector: 'form#authenticationForm',
-    formData: { Mail: username, Password: password },
+    formData: { Email: username, Password: password },
     validate: (statusCode, $) => !$('#mdp').length
   })
 }
