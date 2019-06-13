@@ -1,13 +1,13 @@
 {
   "version": "1.2.0",
-  "name": "Vente Privée",
+  "name": "Veepee",
   "type": "konnector",
   "language": "node",
   "icon": "icon.svg",
   "slug": "venteprivee",
   "source": "git@github.com:konnectors/venteprivee.git",
   "editor": "GaelLeLostec",
-  "vendor_link": "https://secure.fr.vente-privee.com/authentication/portal/FR",
+  "vendor_link": "https://www.veepee.fr/authentication/portal/FR",
   "categories": [
     "shopping"
   ],
@@ -92,6 +92,6 @@
       }
     }
   },
-  "banksTransactionRegExp": "\\bVente\\-privee\\.com\\b",
+  "banksTransactionRegExp": "\\b(Vente\\-privee\\.com|veepee)\\b",
   "manifest_version": "2"
 }

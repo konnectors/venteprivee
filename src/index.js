@@ -42,7 +42,7 @@ async function start(fields) {
 
   log('info', 'Saving data to Cozy')
   const result = await saveBills(documents, fields, {
-    identifiers: ['Vente-privee.com'],
+    identifiers: ['Vente-privee.com', 'veepee'],
     sourceAccount: this.accountId,
     sourceAccountIdentifier: fields.login
   })
