@@ -1,9 +1,8 @@
 language: node_js
 node_js:
-- '8'
+- '12'
 env:
   global:
-  - MATTERMOST_CHANNEL=teamconnecteurs
   - DEPLOY_REPOSITORY="git@github.com:konnectors/venteprivee.git"
   - secure: EIsKzwupc73Kh61idKNSlfLvvw5Y2VNC7IvcXUfXsQRMihtqpc6kP6WuN6EgPRXY6N2txfXeJ1yiWpEBDa96uwx7QR0Nl/6N4hYm+hhQwA4Nn4BHyr1di/UIoIAQd9XKf6L+iK4/CUyGDkg57UZvzIi04NDO0Lievw3kBJvAaUsm+DPyOHT5moxAvM2C1JsHG61JdczlinT9kgjuyRMvqybK7HAxpZJQkqERd7YaNwlMv5ZtaSFje9+i/srhMD9mzBagcB69EBc6vrafX28k6kwBF4AQvnGNYXKiOnkcVfbhyrRUt6LZenFunwjtADhwf90LenahNfuTE/TFJhG/uk6Wn0D+prDuAYu1Co5IUqsLAqRpeprNItmWThfn7e4O89MxKjpqKfcQJfhpPVP8T6WLYp4IVfy9Kf1c+gz0isVmc93WogGeMcCNBL4GUFt10QDz58Xh4+WN5eGXXPYMD76VosWyZEYMt/lFICjP8jIyMLaOK0ENhXF7W6p/bBvJg57Gj8HaXhFvxYJwITF5nU/sbKxBIdxlrG5CndSqyiGpXsXz3Ddh+PiWpuHdSePO78b33E56KvtS4S2jZugGM3jVve9Efs5/ZUmwig/l2PesioT8+7UWWHIu/1O2lIPdxzCwE2VoFfcqmyl8l1KLLdHKUdCfI7bY/gXhNj0lWh0=
   - secure: oTM+Fqt4wUrdxcfnlByYbKmkdj/Bm/AnsArcT7LJ+FS7MhJi76iI22Etqfadx4wrqDhArQrLNnPYCo5yNCdNu0TTW06R/fkefFL+Ze9IgGL2T+dH5ajM1LhQ6WbGHXeGRtZRqJWXBiM9aBSYezQmtEVi6OxlPd6dcwHEg2oSPHXo3E7m2xAaiDPKw2nLskvOD/U8s89HdB1rxZxkiYezIkwLYbTXX2Qo1JRseqJB5ltGawE1gDYrQ5nxBGMv3a7mR2R/LKmnHKC6fFeLdGvZDJ+6M9khbVlMQdfz/QnICh4ucXRP9bpWna/KqMZUI3W/5Eg7ONkLn2yhCqLcQ8LkDx2jUx/58JmpB7c9YYuketWBOtQElQyOm5MH08x06oTKCAuY/IddIuDZ9s/Lgw8aC80QZzLBuR+nY2Eb/TJU6bOA4hekFGIrm9TqVMmxMfVl+7YVXmp/5MVX3h8bWwEtBjE2CtC1lDxkVGeZH1im8lXa6qoMhOl8BuqAbZU+Cbv6AmylcLECTNQtLhiDya5oLxkI94pfUAG8G4MKXJnMWKzPC+7M0aPGzfDju2msl4vNjx05tO3g5ZqoDCKAIvMKYVyPF6iVoouO4nJoq6Mfe2FBDN/tYdoRQGiTAn8efkRKIeD25qKhQp/HsjvH/2Vepa0H+opQdoH042CiL2PYqiM=
@@ -16,12 +15,8 @@ branches:
   - build
   - build-debug
 script:
-- echo 'Linting' && echo -en 'travis_fold:start:lint\\r'
 - yarn lint
-- echo -en 'travis_fold:end:lint\\r'
-- echo 'Building' && echo -en 'travis_fold:start:build\\r'
 - yarn build
-- echo -en 'travis_fold:end:build\\r'
 deploy:
 - provider: script
   skip-cleanup: true
