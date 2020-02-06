@@ -8,19 +8,19 @@ const {
   signin,
   scrape,
   saveBills,
-  log,
-  cozyClient,
-  utils
+  log
 } = require('cozy-konnector-libs')
-const groupBy = require('lodash/groupBy')
-const sortBy = require('lodash/sortBy')
-const flatMap = require('lodash/flatMap')
 
 const request = requestFactory({
   // debug: true,
   cheerio: true,
   json: false,
-  jar: true
+  jar: true,
+  headers: {
+    Accept:
+      'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language': 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3'
+  }
 })
 
 const VENDOR = 'Vente Privée'
@@ -41,25 +41,22 @@ async function start(fields) {
   const documents = await parseDocuments($)
 
   log('info', 'Saving data to Cozy')
-  const result = await saveBills(documents, fields, {
-    identifiers: ['Vente-privee.com', 'veepee'],
+  await saveBills(documents, fields, {
     sourceAccount: this.accountId,
-    sourceAccountIdentifier: fields.login
+    sourceAccountIdentifier: fields.login,
+    linkBankOperations: false,
+    fileIdAttributes: ['vendorRef'],
+    shouldUpdate: (entry, dbEntry) => {
+      const result = entry.vendorRef && !dbEntry.vendorRef
+      return result
+    }
   })
-
-  log('info', 'Clean old bills with wrong date...')
-  try {
-    await removeDuplicatedBills()
-  } catch (err) {
-    log('warn', `There was some error while try to remove duplicated bills`)
-    log('warn', err.message)
-  }
-  return result
 }
 
 function authenticate(username, password) {
   return signin({
-    url: baseUrl + '/authentication/Portal/FR',
+    requestInstance: request,
+    url: baseUrl + '/authentication/',
     formSelector: 'form#authenticationForm',
     formData: { Email: username, Password: password },
     validate: (statusCode, $) => !$('#mdp').length
@@ -86,6 +83,14 @@ function parseDocuments($) {
         sel: 'td.td6 a.billOrder',
         attr: 'href',
         parse: src => (src ? `${baseUrl}/${src}` : null)
+      },
+      vendorRef: {
+        sel: 'td.td6 a.billOrder',
+        attr: 'href',
+        parse: src => {
+          if (!src) return null
+          return new URL(`${baseUrl}/${src}`).searchParams.get('orderId')
+        }
       }
     },
     'tbody .tableLine1'
@@ -102,12 +107,7 @@ function parseDocuments($) {
 
   return docs.map(doc => ({
     ...doc,
-    currency: '€',
-    vendor: VENDOR,
-    metadata: {
-      importDate: new Date(),
-      version: 1
-    }
+    vendor: VENDOR
   }))
 }
 
@@ -139,29 +139,4 @@ function normalizeFileName(date) {
   date = normalizeDate(date)
   const filename = date.toISOString().slice(0, 10)
   return filename
-}
-
-async function removeDuplicatedBills() {
-  const billsByFileUrl = groupBy(
-    (await cozyClient.data.findAll('io.cozy.bills')).filter(
-      bill => bill.vendor === VENDOR
-    ),
-    'fileurl'
-  )
-
-  const billsToRemove = flatMap(Object.values(billsByFileUrl), bills =>
-    sortBy(bills, 'metadata.importDate')
-      .reverse()
-      .slice(1)
-  )
-
-  const undefinedBills =
-    billsByFileUrl['https://secure.fr.vente-privee.com/undefined']
-  if (undefinedBills) billsToRemove.push(undefinedBills[0])
-
-  if (billsToRemove.length) {
-    log('info', `${billsToRemove.length} bills to remove...`)
-    await utils.batchDelete('io.cozy.bills', billsToRemove)
-    log('info', 'done')
-  }
 }
