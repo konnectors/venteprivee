@@ -45,9 +45,14 @@ class VeepeeConnector extends CookieKonnector {
   authenticate(username, password) {
     return this.signin({
       requestInstance: this.request,
-      url: baseUrl + '/authentication/',
+      url: baseUrl + '/authentication/login?ReturnUrl=%2fmemberaccount%2forder',
       formSelector: 'form#authenticationForm',
-      formData: { Email: username, Password: password },
+      formData: {
+        Email: username,
+        Mail: username,
+        Password: password,
+        RememberMe: 'true'
+      },
       validate: (statusCode, $) => !$('#mdp').length
     })
   }
@@ -102,7 +107,7 @@ class VeepeeConnector extends CookieKonnector {
 }
 
 const connector = new VeepeeConnector({
-  debug: 'simple',
+  // debug: true,
   cheerio: true,
   json: false,
   jar: true,
