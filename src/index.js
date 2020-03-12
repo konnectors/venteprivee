@@ -2,15 +2,107 @@ process.env.SENTRY_DSN =
   process.env.SENTRY_DSN ||
   'https://8939dc7be44d4e34928a23bf709f0251@sentry.cozycloud.cc/98'
 
-const {
-  BaseKonnector,
-  requestFactory,
-  scrape,
-  log
-} = require('cozy-konnector-libs')
+const { CookieKonnector, scrape, log } = require('cozy-konnector-libs')
 
-const request = requestFactory({
-  // debug: true,
+const VENDOR = 'Vente Privée'
+
+const baseUrl = 'https://www.veepee.fr'
+
+class VeepeeConnector extends CookieKonnector {
+  async testSession() {
+    if (!this._jar._jar.toJSON().cookies.length) {
+      return false
+    }
+    log('info', 'Testing session')
+    const $ = await this.request(`${baseUrl}/memberaccount/order/`)
+    const result = !$('#mdp').length
+    if (!result) {
+      log('info', 'Saved session usage failed')
+    } else {
+      log('info', 'Saved session OK')
+    }
+    return result
+  }
+
+  async fetch(fields) {
+    if (!(await this.testSession())) {
+      await this.authenticate(fields.login, fields.password)
+    }
+
+    log('info', 'Fetching the list of commandes')
+    const $ = await this.request(`${baseUrl}/memberaccount/order/`)
+
+    log('info', 'Parsing list of commandes')
+    const documents = await this.parseDocuments($)
+
+    log('info', 'Saving data to Cozy')
+    await this.saveBills(documents, fields, {
+      linkBankOperations: false,
+      fileIdAttributes: ['vendorRef']
+    })
+  }
+
+  authenticate(username, password) {
+    return this.signin({
+      requestInstance: this.request,
+      url: baseUrl + '/authentication/',
+      formSelector: 'form#authenticationForm',
+      formData: { Email: username, Password: password },
+      validate: (statusCode, $) => !$('#mdp').length
+    })
+  }
+
+  parseDocuments($) {
+    const docs = scrape(
+      $,
+      {
+        date: {
+          sel: 'td.td2',
+          parse: text => normalizeDate(text)
+        },
+        filename: {
+          sel: 'td.td2',
+          parse: text => normalizeFileName(text)
+        },
+        amount: {
+          sel: 'td.td3',
+          parse: normalizePrice
+        },
+        fileurl: {
+          sel: 'td.td6 a.billOrder',
+          attr: 'href',
+          parse: src => (src ? `${baseUrl}/${src}` : null)
+        },
+        vendorRef: {
+          sel: 'td.td6 a.billOrder',
+          attr: 'href',
+          parse: src => {
+            if (!src) return null
+            return new URL(`${baseUrl}/${src}`).searchParams.get('orderId')
+          }
+        }
+      },
+      'tbody .tableLine1'
+    ).filter(doc => doc.fileurl)
+
+    for (let doc of docs) {
+      doc.filename =
+        'VentePrivee_' +
+        doc.filename +
+        '_' +
+        String(doc.amount).replace('.', ',') +
+        '.pdf'
+    }
+
+    return docs.map(doc => ({
+      ...doc,
+      vendor: VENDOR
+    }))
+  }
+}
+
+const connector = new VeepeeConnector({
+  debug: 'simple',
   cheerio: true,
   json: false,
   jar: true,
@@ -21,87 +113,7 @@ const request = requestFactory({
   }
 })
 
-const VENDOR = 'Vente Privée'
-
-const baseUrl = 'https://www.veepee.fr'
-
-module.exports = new BaseKonnector(start)
-
-async function start(fields) {
-  log('info', 'Authenticating ...')
-  await authenticate.bind(this)(fields.login, fields.password)
-  log('info', 'Successfully logged in')
-
-  log('info', 'Fetching the list of commandes')
-  const $ = await request(`${baseUrl}/memberaccount/order/`)
-
-  log('info', 'Parsing list of commandes')
-  const documents = await parseDocuments($)
-
-  log('info', 'Saving data to Cozy')
-  await this.saveBills(documents, fields, {
-    linkBankOperations: false,
-    fileIdAttributes: ['vendorRef']
-  })
-}
-
-function authenticate(username, password) {
-  return this.signin({
-    requestInstance: request,
-    url: baseUrl + '/authentication/',
-    formSelector: 'form#authenticationForm',
-    formData: { Email: username, Password: password },
-    validate: (statusCode, $) => !$('#mdp').length
-  })
-}
-
-function parseDocuments($) {
-  const docs = scrape(
-    $,
-    {
-      date: {
-        sel: 'td.td2',
-        parse: text => normalizeDate(text)
-      },
-      filename: {
-        sel: 'td.td2',
-        parse: text => normalizeFileName(text)
-      },
-      amount: {
-        sel: 'td.td3',
-        parse: normalizePrice
-      },
-      fileurl: {
-        sel: 'td.td6 a.billOrder',
-        attr: 'href',
-        parse: src => (src ? `${baseUrl}/${src}` : null)
-      },
-      vendorRef: {
-        sel: 'td.td6 a.billOrder',
-        attr: 'href',
-        parse: src => {
-          if (!src) return null
-          return new URL(`${baseUrl}/${src}`).searchParams.get('orderId')
-        }
-      }
-    },
-    'tbody .tableLine1'
-  ).filter(doc => doc.fileurl)
-
-  for (let doc of docs) {
-    doc.filename =
-      'VentePrivee_' +
-      doc.filename +
-      '_' +
-      String(doc.amount).replace('.', ',') +
-      '.pdf'
-  }
-
-  return docs.map(doc => ({
-    ...doc,
-    vendor: VENDOR
-  }))
-}
+connector.run()
 
 /**
  * convert a price string to a float
