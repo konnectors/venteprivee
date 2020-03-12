@@ -5,9 +5,7 @@ process.env.SENTRY_DSN =
 const {
   BaseKonnector,
   requestFactory,
-  signin,
   scrape,
-  saveBills,
   log
 } = require('cozy-konnector-libs')
 
@@ -31,7 +29,7 @@ module.exports = new BaseKonnector(start)
 
 async function start(fields) {
   log('info', 'Authenticating ...')
-  await authenticate(fields.login, fields.password)
+  await authenticate.bind(this)(fields.login, fields.password)
   log('info', 'Successfully logged in')
 
   log('info', 'Fetching the list of commandes')
@@ -41,20 +39,14 @@ async function start(fields) {
   const documents = await parseDocuments($)
 
   log('info', 'Saving data to Cozy')
-  await saveBills(documents, fields, {
-    sourceAccount: this.accountId,
-    sourceAccountIdentifier: fields.login,
+  await this.saveBills(documents, fields, {
     linkBankOperations: false,
-    fileIdAttributes: ['vendorRef'],
-    shouldUpdate: (entry, dbEntry) => {
-      const result = entry.vendorRef && !dbEntry.vendorRef
-      return result
-    }
+    fileIdAttributes: ['vendorRef']
   })
 }
 
 function authenticate(username, password) {
-  return signin({
+  return this.signin({
     requestInstance: request,
     url: baseUrl + '/authentication/',
     formSelector: 'form#authenticationForm',
