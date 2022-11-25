@@ -9,7 +9,6 @@
   "keywords": [],
   "author": "Gaël Le Lostec",
   "license": "AGPL-3.0",
-  "main": "./src/index.js",
   "eslintConfig": {
     "extends": [
       "cozy-app"
